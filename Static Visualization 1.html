@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5.30.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.20.1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.26.0"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      width: 100%;
+      background-color: #283593;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    header p {
+      margin: 5px 0 0;
+      font-size: 1rem;
+    }
+
+    #vis-container {
+      margin: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      width: 90%;
+      max-width: 1200px;
+    }
+
+    #vis {
+      width: 100%;
+      height: 100%;
+    }
+
+    #details {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      width: 90%;
+      max-width: 1200px;
+      margin: 20px;
+      text-align: left;
+      line-height: 1.6;
+    }
+
+    #details h2 {
+      font-size: 1.4rem;
+      color: #283593;
+      margin-bottom: 10px;
+    }
+
+    #details ul {
+      margin: 0;
+      padding: 0;
+      list-style-type: none;
+    }
+
+    #details ul li {
+      margin-bottom: 8px;
+      padding-left: 16px;
+      position: relative;
+    }
+
+    #details ul li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #283593;
+      font-size: 1.2rem;
+    }
+
+    footer {
+      margin-top: 20px;
+      background-color: #283593;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      width: 100%;
+    }
+
+    footer p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Radar Chart Visualization</h1>
+    <p>Comparing Accident Types between 2023 & 2024</p>
+    <p>Encodings and Benefits of the Visualization at the end of the page</p>
+  </header>
+
+  <div id="vis-container">
+    <div id="vis"></div>
+  </div>
+
+  <div id="details">
+    <h2>Encodings:</h2>
+    <ul>
+      <li><strong>Angle (Theta):</strong> Represents the proportion of each accident type.</li>
+      <li><strong>Colour:</strong> Differentiates accident types by assigning unique colours.</li>
+      <li><strong>Radius:</strong> Shows the number of accidents for each type in 2023 and 2024. Larger values are farther from the centre.</li>
+      <li><strong>Tooltip:</strong> Displays details like accident type, count, and year when hovered over.</li>
+    </ul>
+
+    <h2>Key Benefits:</h2>
+    <ul>
+      <li><strong>Clear Overview:</strong> Easily see the distribution of accident types for both years.</li>
+      <li><strong>Spot Trends:</strong> Quickly identify changes in accident frequencies between 2023 and 2024.</li>
+      <li><strong>Identify Leaders:</strong> See which accident types are most frequent in each year.</li>
+      <li><strong>Interactive Insights:</strong> Tooltips and selection let users explore details for deeper understanding.</li>
+    </ul>
+  </div>
+
+  <footer>
+    <p>Static Radar Chart - Vega Visualization</p>
+  </footer>
+
+  <script>
+    const spec = {
+      "$schema": "https://vega.github.io/schema/vega/v5.json",
+      "description": "Radar chart comparing accident types between 2023 and 2024",
+      "width": 900,
+      "height": 900,
+      "padding": 150,
+      "autosize": "none",
+      "title": {
+        "text": "Comparing Accidents Types between 2023 & 2024",
+        "fontSize": 24,
+        "font": "Arial",
+        "anchor": "middle",
+        "dy": -40
+      },
+      "signals": [
+        {"name": "radius", "update": "min(width, height) / 2 - 100"},
+        {"name": "angleStep", "update": "2 * PI / length(data('accident_types'))"}
+      ],
+      "data": [
+        {
+          "name": "accident_types",
+          "values": [
+            {"type": "بسيط", "id": 0},
+            {"type": "بليغ", "id": 1},
+            {"type": "حريق مركبة أثناء سيرها", "id": 2},
+            {"type": "عبور شخص أو عدة أشخاص من مكان غير مخصص", "id": 3},
+            {"type": "مركبات مخالفة", "id": 4}
+          ]
+        },
+        {
+          "name": "accidents_by_year",
+          "values": [
+            {"year": 2023, "type": "بسيط", "count": 10849, "id": 0},
+            {"year": 2023, "type": "بليغ", "count": 1101, "id": 1},
+            {"year": 2023, "type": "حريق مركبة أثناء سيرها", "count": 13, "id": 2},
+            {
+              "year": 2023,
+              "type": "عبور شخص أو عدة أشخاص من مكان غير مخصص",
+              "count": 24,
+              "id": 3
+            },
+            {"year": 2023, "type": "مركبات مخالفة", "count": 377, "id": 4},
+            {"year": 2024, "type": "بسيط", "count": 31610, "id": 0},
+            {"year": 2024, "type": "بليغ", "count": 2713, "id": 1},
+            {"year": 2024, "type": "حريق مركبة أثناء سيرها", "count": 38, "id": 2},
+            {
+              "year": 2024,
+              "type": "عبور شخص أو عدة أشخاص من مكان غير مخصص",
+              "count": 145,
+              "id": 3
+            },
+            {"year": 2024, "type": "مركبات مخالفة", "count": 1948, "id": 4}
+          ]
+        },
+        {
+          "name": "data_2023",
+          "source": "accidents_by_year",
+          "transform": [{"type": "filter", "expr": "datum.year === 2023"}]
+        },
+        {
+          "name": "data_2024",
+          "source": "accidents_by_year",
+          "transform": [{"type": "filter", "expr": "datum.year === 2024"}]
+        }
+      ],
+      "scales": [
+        {
+          "name": "radius",
+          "type": "log",
+          "domain": [10, 55000],
+          "range": [0, {"signal": "radius"}],
+          "base": 10,
+          "nice": true,
+          "zero": false
+        },
+        {
+          "name": "color",
+          "type": "ordinal",
+          "domain": [2023, 2024],
+          "range": ["#2196F3", "#FF9800"]
+        }
+      ],
+      "marks": [
+        {
+          "type": "group",
+          "encode": {
+            "enter": {"x": {"signal": "width / 2"}, "y": {"signal": "height / 2"}}
+          },
+          "marks": [
+            {
+              "type": "rule",
+              "from": {"data": "accident_types"},
+              "encode": {
+                "enter": {
+                  "x": {"value": 0},
+                  "y": {"value": 0},
+                  "x2": {"signal": "radius * cos(datum.id * angleStep)"},
+                  "y2": {"signal": "-radius * sin(datum.id * angleStep)"},
+                  "stroke": {"value": "#999"},
+                  "strokeWidth": {"value": 1}
+                }
+              }
+            },
+            {
+              "type": "line",
+              "from": {"data": "data_2023"},
+              "encode": {
+                "enter": {
+                  "interpolate": {"value": "linear-closed"},
+                  "x": {
+                    "signal": "scale('radius', max(datum.count, 10)) * cos(datum.id * angleStep)"
+                  },
+                  "y": {
+                    "signal": "-scale('radius', max(datum.count, 10)) * sin(datum.id * angleStep)"
+                  },
+                  "stroke": {"value": "#2196F3"},
+                  "strokeWidth": {"value": 4},
+                  "strokeOpacity": {"value": 0.8}
+                }
+              }
+            },
+            {
+              "type": "line",
+              "from": {"data": "data_2024"},
+              "encode": {
+                "enter": {
+                  "interpolate": {"value": "linear-closed"},
+                  "x": {
+                    "signal": "scale('radius', max(datum.count, 10)) * cos(datum.id * angleStep)"
+                  },
+                  "y": {
+                    "signal": "-scale('radius', max(datum.count, 10)) * sin(datum.id * angleStep)"
+                  },
+                  "stroke": {"value": "#FF9800"},
+                  "strokeWidth": {"value": 4},
+                  "strokeOpacity": {"value": 0.8}
+                }
+              }
+            },
+            {
+              "type": "symbol",
+              "from": {"data": "accidents_by_year"},
+              "encode": {
+                "enter": {
+                  "x": {
+                    "signal": "scale('radius', max(datum.count, 10)) * cos(datum.id * angleStep)"
+                  },
+                  "y": {
+                    "signal": "-scale('radius', max(datum.count, 10)) * sin(datum.id * angleStep)"
+                  },
+                  "size": {"value": 250},
+                  "fill": {"scale": "color", "field": "year"},
+                  "stroke": {"value": "white"},
+                  "strokeWidth": {"value": 2}
+                }
+              }
+            },
+            {
+              "type": "text",
+              "from": {"data": "accidents_by_year"},
+              "encode": {
+                "enter": {
+                  "x": {
+                    "signal": "scale('radius', max(datum.count, 10)) * cos(datum.id * angleStep)"
+                  },
+                  "y": {
+                    "signal": "-scale('radius', max(datum.count, 10)) * sin(datum.id * angleStep)"
+                  },
+                  "text": {"field": "count"},
+                  "align": {"value": "center"},
+                  "baseline": {"value": "middle"},
+                  "fontSize": {"value": 12},
+                  "font": {"value": "Arial"},
+                  "fill": {"value": "black"},
+                  "fontWeight": {"value": "bold"}
+                }
+              }
+            },
+            {
+              "type": "text",
+              "from": {"data": "accident_types"},
+              "encode": {
+                "enter": {
+                  "x": {"signal": "(radius + 50) * cos(datum.id * angleStep)"},
+                  "y": {"signal": "-(radius + 50) * sin(datum.id * angleStep)"},
+                  "text": {"field": "type"},
+                  "align": {
+                    "signal": "abs(cos(datum.id * angleStep)) < 0.5 ? 'center' : (cos(datum.id * angleStep) < 0 ? 'right' : 'left')"
+                  },
+                  "baseline": {
+                    "signal": "abs(sin(datum.id * angleStep)) < 0.5 ? 'middle' : (sin(datum.id * angleStep) < 0 ? 'top' : 'bottom')"
+                  },
+                  "fontSize": {"value": 14},
+                  "font": {"value": "Arial"}
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "legends": [
+        {
+          "fill": "color",
+          "title": "Years",
+          "titleFont": "Arial",
+          "titleFontSize": 16,
+          "labelFont": "Arial",
+          "labelFontSize": 14,
+          "orient": "top-right",
+          "direction": "horizontal",
+          "padding": 30
+        }
+      ],
+      "config": {}
+    };
+
+    vegaEmbed("#vis", spec, {mode: "vega"}).then(console.log).catch(console.warn);
+  </script>
+</body>
+</html>
